@@ -33,8 +33,12 @@
             padding: 20px;
             border-radius: 12px;
             cursor: pointer;
+            transition: all 0.2s;
         }
-        .card:hover { background: #334155; }
+        .card:hover { 
+            background: #3b82f6;
+            transform: translateY(-2px);
+        }
         .card h3 { color: #3b82f6; margin-bottom: 8px; }
         .card p { color: #94a3b8; font-size: 0.875rem; }
         #loading { text-align: center; padding: 40px; color: #94a3b8; }
@@ -46,7 +50,7 @@
         <p>Sistema de Prompts + Groq</p>
     </header>
     <main>
-        <div id="loading">Carregando...</div>
+        <div id="loading">Carregando prompts...</div>
         <div id="content" class="grid" style="display:none;"></div>
     </main>
     <script>
@@ -60,6 +64,7 @@
                     const div = document.createElement('div');
                     div.className = 'card';
                     div.innerHTML = `<h3>${cat.name}</h3><p>${cat.count} prompt(s)</p>`;
+                    div.onclick = () => window.location.href = `/api/prompts/${cat.name}/${cat.prompts[0].name}`;
                     container.appendChild(div);
                 });
             })
