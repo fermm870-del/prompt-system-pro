@@ -1,0 +1,8 @@
+{
+  "name": "prompt-system-pro",
+  "version": "1.0.0",
+  "scripts": {
+    "build": "cd frontend && npm install && npm run build && rm -rf ../backend/public && cp -r build ../backend/public && cd ../backend && npm install",
+    "start": "cd backend && npm start"
+  }
+}
