@@ -1,0 +1,1 @@
+markdown<br># AUTH PATTERNS<br><br>## JWT<br>- Access token: 15min<br>- Refresh token: 7d<br>- bcrypt: 12 rounds<br><br>## PROTECOES<br>- Rate limiting em auth<br>- Brute force protection<br>- Password strength<br>
