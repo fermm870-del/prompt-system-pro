@@ -16,14 +16,12 @@ app.use(express.json({ limit: '10mb' }));
 const groq = new Groq({ apiKey: process.env.GROQ_API_KEY });
 const PROMPTS_DIR = path.join(__dirname, 'prompts');
 
-// ============================================
-// API ROUTES
-// ============================================
-
+// Health check
 app.get('/health', (req, res) => {
-  res.json({ status: 'OK', service: 'Prompt System Pro', version: '1.0.0' });
+  res.json({ status: 'OK', service: 'Prompt System Pro' });
 });
 
+// API - Listar prompts
 app.get('/api/prompts', async (req, res) => {
   try {
     const categories = [];
@@ -56,11 +54,11 @@ app.get('/api/prompts', async (req, res) => {
     
     res.json(categories);
   } catch (error) {
-    console.error('Error:', error);
     res.json([]);
   }
 });
 
+// API - Ver prompt específico
 app.get('/api/prompts/:category/:name', async (req, res) => {
   try {
     const { category, name } = req.params;
@@ -77,9 +75,10 @@ app.get('/api/prompts/:category/:name', async (req, res) => {
   }
 });
 
+// API - Gerar com Groq
 app.post('/api/generate', async (req, res) => {
   try {
-    const { promptId, userRequest, model = 'llama-3.3-70b-versatile' } = req.body;
+    const { promptId, userRequest } = req.body;
     
     if (!userRequest) {
       return res.status(400).json({ error: 'userRequest required' });
@@ -100,52 +99,44 @@ app.post('/api/generate', async (req, res) => {
         { role: 'system', content: systemPrompt },
         { role: 'user', content: userRequest }
       ],
-      model,
+      model: 'llama-3.3-70b-versatile',
       temperature: 0.7,
       max_tokens: 4096
     });
     
     res.json({
       success: true,
-      response: completion.choices[0]?.message?.content,
-      model,
-      promptUsed: promptId || 'default'
+      response: completion.choices[0]?.message?.content
     });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-// ============================================
-// SERVIR FRONTEND
-// ============================================
-
+// FRONTEND - Servir arquivos estáticos
 const publicPath = path.join(__dirname, 'public');
-
-// Criar pasta public se não existir
-if (!fs.existsSync(publicPath)) {
-  fs.mkdirSync(publicPath, { recursive: true });
-}
 
 app.use(express.static(publicPath));
 
 app.get('*', (req, res) => {
-  if (!req.path.startsWith('/api') && !req.path.startsWith('/health')) {
-    const indexPath = path.join(publicPath, 'index.html');
-    if (fs.existsSync(indexPath)) {
-      res.sendFile(indexPath);
-    } else {
-      res.json({ error: 'Frontend not built', api: '/api/prompts' });
-    }
+  if (req.path.startsWith('/api') || req.path.startsWith('/health')) {
+    return;
+  }
+  
+  const indexPath = path.join(publicPath, 'index.html');
+  
+  if (fs.existsSync(indexPath)) {
+    res.sendFile(indexPath);
+  } else {
+    res.json({ 
+      error: 'Frontend not found', 
+      api: '/api/prompts',
+      message: 'Crie backend/public/index.html'
+    });
   }
 });
 
-// ============================================
 // START
-// ============================================
-
 app.listen(PORT, () => {
-  console.log(`🚀 Server: http://localhost:${PORT}`);
-  console.log(`📁 Prompts: ${PROMPTS_DIR}`);
-  console.log(`📱 Public: ${publicPath}`);
+  console.log(`Server running on port ${PORT}`);
 });
