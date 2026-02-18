@@ -1,0 +1,1 @@
+markdown<br># NODEJS API PRO<br><br>## ARQUITETURA<br>src/<br>├── controllers/<br>├── services/<br>├── repositories/<br>└── middlewares/<br><br>## SEGURANCA<br>1. Validacao Zod<br>2. Rate limiting<br>3. Helmet headers<br>4. CORS configurado<br>5. SQL injection prevention<br>
